@@ -11,6 +11,19 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'recipes',
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./recipes/recipes.module').then( m => m.RecipesPageModule),
+      },
+      {
+        path: ':recipeId',
+        loadChildren: () => import('./recipes/recipe-detail/recipe-detail.module').then( m => m.RecipeDetailPageModule),
+      },
+    ]
+  },
 ];
 
 @NgModule({
