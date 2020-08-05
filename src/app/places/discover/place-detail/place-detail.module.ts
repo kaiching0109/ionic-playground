@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, NavController } from '@ionic/angular';
 
 import { PlaceDetailPageRoutingModule } from './place-detail-routing.module';
 
@@ -17,4 +17,16 @@ import { PlaceDetailPage } from './place-detail.page';
   ],
   declarations: [PlaceDetailPage]
 })
-export class PlaceDetailPageModule {}
+
+export class PlaceDetailPageModule {
+
+  constructor(private navCtl: NavController){
+
+  }
+
+  onBookpalce() {
+    //this.router.navigate('/places/tabs/discover')
+    this.navCtl.navigateBack('/places/tabs/discover');
+  }
+
+}
