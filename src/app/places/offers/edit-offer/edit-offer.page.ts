@@ -13,7 +13,7 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 export class EditOfferPage implements OnInit {
 
   place: Place;
-  form: ReactiveFormsModule;
+  form: FormGroup;
 
   constructor(private activatedRoute: ActivatedRoute, private navCtl: NavController, private placesService: PlacesService) { }
 
@@ -44,6 +44,9 @@ export class EditOfferPage implements OnInit {
 
 
   onEditSubmit() {
-    console.log(this.form)
+    if(!this.form.valid) return
+    else {
+      
+    }
   }
 }
