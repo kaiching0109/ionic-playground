@@ -6,6 +6,7 @@ export class Place {
         public imageUrl: string, 
         public price: number,
         public availableTo: Date,
-        public availableFrom: Date) {
+        public availableFrom: Date,
+        public userId: string) {
     }
 }
