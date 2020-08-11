@@ -7,6 +7,7 @@ import { take, delay, map, tap } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
+
 export class PlacesService {
   private _places = new BehaviorSubject<Place[]>(
     [
@@ -58,5 +59,15 @@ export class PlacesService {
   addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date){
     const newPlace = new Place(Math.random().toString(), title, description, "https://favim.com/orig/201106/28/castle-fog-foggy-hawarden-castle-mist-Favim.com-86047.jpg", price, dateFrom, dateTo, this.authService.userId);
     return this.places.pipe(take(1), delay(1000), tap(places => { this._places.next([...places, newPlace]) }))
+  }
+
+  updatePlace(id: string, title: string, description: string) {
+    return this.places.pipe(take(1), delay(1000), tap(places => {
+      let placeToUpdateIndex = places.findIndex(place => place?.id === id)
+      if(placeToUpdateIndex > 0) {
+        this.places[placeToUpdateIndex] = {...places[placeToUpdateIndex], title, description };
+        return this.places;
+      }
+    }))
   }
 }
