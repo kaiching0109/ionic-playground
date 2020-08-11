@@ -38,6 +38,9 @@ export class NewOfferPage implements OnInit {
   }
 
   onCreateOffer() {
-    console.log('Creating offered place...')
+    if(!this.form.valid) return
+    else {
+      
+    }
   }
 }
