@@ -65,8 +65,8 @@ export class PlacesService {
     return this.places.pipe(take(1), delay(1000), tap(places => {
       let placeToUpdateIndex = places.findIndex(place => place?.id === id)
       if(placeToUpdateIndex > 0) {
-        this.places[placeToUpdateIndex] = {...places[placeToUpdateIndex], title, description };
-        return this.places;
+        places[placeToUpdateIndex] = {...places[placeToUpdateIndex], title, description };
+        this._places.next([...places]);
       }
     }))
   }
