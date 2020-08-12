@@ -15,9 +15,9 @@ export class DiscoverPage implements OnInit, OnDestroy {
   placeSub: Subscription;
   relevantPlaces: Place[];
   listedLoadedPlaces: Place[];
+  isLoading: boolean = false;
 
   constructor(private placesService: PlacesService, private authService: AuthService) { }
-
   ngOnInit() {
     this.placeSub = this.placesService.places.subscribe(places => { 
       this.loadedPlaces = places; 
@@ -28,6 +28,13 @@ export class DiscoverPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     if(this.placeSub) this.placeSub.unsubscribe();
+  }
+
+  ionViewWillEnter() {
+    this.isLoading = true;
+    this.placesService.fetchPlaces().subscribe(() => {
+      this.isLoading = false;
+    });
   }
 
   onFilterUpdate(event: CustomEvent<SegmentChangeEventDetail>) {

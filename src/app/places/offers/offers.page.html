@@ -21,7 +21,7 @@
       </div>
       <div class="ion-text-center" *ngIf="!isLoading && offers.length <= 0">
         <p>No offer is found...</p>
-        <ion-button color="priamry" routerLink="/places/tabs/offers/new">Offer New Place</ion-button>
+        <ion-button color="primary" routerLink="/places/tabs/offers/new">Offer New Place</ion-button>
       </div>
       <ion-list *ngIf="!isLoading && offers.length > 0">
         <ion-item-sliding *ngFor="let offer of offers" #slidingItem>

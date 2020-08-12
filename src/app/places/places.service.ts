@@ -5,6 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 import { take, delay, map, tap, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
+const API_URL = "https://ionic-first-app-6f99b.firebaseio.com/offered-places.json";
 
 export interface PlaceData {
   userId: string;
@@ -62,9 +63,10 @@ export class PlacesService {
   constructor(private authService: AuthService, private http: HttpClient) { }
 
   fetchPlaces() {
-    return this.http.get<{ [name: string] : PlaceData}>('https://ionic-first-app-6f99b.firebaseio.com/offered-places.json')
+    return this.http.get<{ [name: string] : PlaceData}>(API_URL)
       .pipe(
         map(places => {
+          if(!places) return []
           return <Place []>Object.keys(places).map(key => {
             console.log({key})
             const { availableFrom, availableTo, ...rest } = places[key];
@@ -96,7 +98,7 @@ export class PlacesService {
   addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date){
     const newPlace = new Place(Math.random().toString(), title, description, "https://favim.com/orig/201106/28/castle-fog-foggy-hawarden-castle-mist-Favim.com-86047.jpg", price, dateFrom, dateTo, this.authService.userId);
     let generatedId;
-    return this.http.post<{name: string}>('https://ionic-first-app-6f99b.firebaseio.com/offered-places.json', { ...newPlace, id: null })
+    return this.http.post<{name: string}>(API_URL, { ...newPlace, id: null })
       .pipe(
         switchMap(resData => { 
           generatedId = resData?.name;
@@ -110,12 +112,19 @@ export class PlacesService {
   }
 
   updatePlace(id: string, title: string, description: string) {
-    return this.places.pipe(take(1), delay(1000), tap(places => {
-      let placeToUpdateIndex = places.findIndex(place => place?.id === id)
-      if(placeToUpdateIndex > 0) {
-        places[placeToUpdateIndex] = {...places[placeToUpdateIndex], title, description };
-        this._places.next([...places]);
-      }
-    }))
+    let updatedPlaces: Place[];
+    return this.places.pipe(
+      take(1), 
+      switchMap(places => {
+        updatedPlaces = [...places];
+        let placeToUpdateIndex = places.findIndex(place => place?.id === id)
+        const contetToUpdate = {...updatedPlaces[placeToUpdateIndex], title, description };
+        updatedPlaces[placeToUpdateIndex] = contetToUpdate;
+        return this.http.put(`https://ionic-first-app-6f99b.firebaseio.com/offered-places/${id}.json`, {...contetToUpdate, id: null})
+      }),
+      tap(() => {
+        this._places.next([...updatedPlaces]);
+      })
+    )
   }
 }
