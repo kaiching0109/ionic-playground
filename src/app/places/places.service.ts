@@ -5,43 +5,53 @@ import { BehaviorSubject } from 'rxjs';
 import { take, delay, map, tap, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
+
+export interface PlaceData {
+  userId: string;
+  title: string;
+  imageUrl: string;
+  price: number;
+  description: string;
+  availableFrom: string;
+  availableTo: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
-
 export class PlacesService {
   private _places = new BehaviorSubject<Place[]>(
     [
-      new Place(
-        'p1',
-        'Manhattan Mansion',
-        'In the heart of New York City.',
-        'https://imgs.6sqft.com/wp-content/uploads/2014/06/21042533/Carnegie-Mansion-nyc.jpg',
-        149.99,
-        new Date('2019-01-01'),
-        new Date('2019-12-31'),
-        'abc'
-      ), 
-      new Place(
-        'p2',
-        'L\' Amour Toujours',
-        'A romantic place in Paris!',
-        'https://static.amazon.jobs/locations/7/thumbnails/Paris_-_Thumbnail.jpg?1454183453',
-        189.99,
-        new Date('2019-01-01'),
-        new Date('2019-12-31'),
-        'abc'
-      ), 
-      new Place(
-        'p3',
-        'The Foggy Palace',
-        'Not your average city trip!',
-        'https://favim.com/orig/201106/28/castle-fog-foggy-hawarden-castle-mist-Favim.com-86047.jpg',
-        99.99,
-        new Date('2019-01-01'),
-        new Date('2019-12-31'),
-        'abc'
-      )
+      // new Place(
+      //   'p1',
+      //   'Manhattan Mansion',
+      //   'In the heart of New York City.',
+      //   'https://imgs.6sqft.com/wp-content/uploads/2014/06/21042533/Carnegie-Mansion-nyc.jpg',
+      //   149.99,
+      //   new Date('2019-01-01'),
+      //   new Date('2019-12-31'),
+      //   'abc'
+      // ), 
+      // new Place(
+      //   'p2',
+      //   'L\' Amour Toujours',
+      //   'A romantic place in Paris!',
+      //   'https://static.amazon.jobs/locations/7/thumbnails/Paris_-_Thumbnail.jpg?1454183453',
+      //   189.99,
+      //   new Date('2019-01-01'),
+      //   new Date('2019-12-31'),
+      //   'abc'
+      // ), 
+      // new Place(
+      //   'p3',
+      //   'The Foggy Palace',
+      //   'Not your average city trip!',
+      //   'https://favim.com/orig/201106/28/castle-fog-foggy-hawarden-castle-mist-Favim.com-86047.jpg',
+      //   99.99,
+      //   new Date('2019-01-01'),
+      //   new Date('2019-12-31'),
+      //   'xyz'
+      // )
     ]
   );
 
@@ -52,7 +62,29 @@ export class PlacesService {
   constructor(private authService: AuthService, private http: HttpClient) { }
 
   fetchPlaces() {
-    this.http.get('')
+    return this.http.get<{ [name: string] : PlaceData}>('https://ionic-first-app-6f99b.firebaseio.com/offered-places.json')
+      .pipe(
+        map(places => {
+          return <Place []>Object.keys(places).map(key => {
+            console.log({key})
+            const { availableFrom, availableTo, ...rest } = places[key];
+            return new Place(
+              key,
+              rest.title,
+              rest.description,
+              rest.imageUrl,
+              rest.price,
+              new Date(availableFrom), 
+              new Date(availableTo),
+              rest.userId
+            );
+          })
+        }),
+        tap(places => { 
+          console.log({places})
+          this._places.next(places);
+        }),
+      )
   }
 
   getPlace(placeId: string) {
