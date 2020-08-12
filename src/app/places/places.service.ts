@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Place } from './place.model';
 import { AuthService } from '../auth/auth.service';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { take, delay, map, tap, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
@@ -90,9 +90,11 @@ export class PlacesService {
   }
 
   getPlace(placeId: string) {
-    return this.places.pipe(take(1), map(places => {
-      return {...places.find(p => p?.id === placeId)}
-    }))
+    return this.http
+      .get<PlaceData>(`https://ionic-first-app-6f99b.firebaseio.com/offered-places/${placeId}.json`)
+      .pipe(
+          map(placeData => new Place(placeId, placeData.title, placeData?.description, placeData.imageUrl, placeData.price, new Date(placeData.availableTo), new Date(placeData.availableFrom), placeData.userId))
+      )
   }
 
   addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date){
@@ -116,11 +118,17 @@ export class PlacesService {
     return this.places.pipe(
       take(1), 
       switchMap(places => {
+        if(!places || places.length <= 0) return this.fetchPlaces()
+        else {
+          return of(places)
+        }
+      }),
+      switchMap(places => {
         updatedPlaces = [...places];
         let placeToUpdateIndex = places.findIndex(place => place?.id === id)
         const contetToUpdate = {...updatedPlaces[placeToUpdateIndex], title, description };
         updatedPlaces[placeToUpdateIndex] = contetToUpdate;
-        return this.http.put(`https://ionic-first-app-6f99b.firebaseio.com/offered-places/${id}.json`, {...contetToUpdate, id: null})
+        return this.http.put(`https://ionic-first-app-6f99b.firebaseio.com/offered-places/${id}.json`, {...contetToUpdate, id: null}) 
       }),
       tap(() => {
         this._places.next([...updatedPlaces]);
