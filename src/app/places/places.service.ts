@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { Place } from './place.model';
 import { AuthService } from '../auth/auth.service';
 import { BehaviorSubject } from 'rxjs';
-import { take, delay, map, tap } from 'rxjs/operators';
+import { take, delay, map, tap, switchMap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -48,7 +49,11 @@ export class PlacesService {
     return this._places.asObservable();
   }
   
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService, private http: HttpClient) { }
+
+  fetchPlaces() {
+    this.http.get('')
+  }
 
   getPlace(placeId: string) {
     return this.places.pipe(take(1), map(places => {
@@ -58,7 +63,18 @@ export class PlacesService {
 
   addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date){
     const newPlace = new Place(Math.random().toString(), title, description, "https://favim.com/orig/201106/28/castle-fog-foggy-hawarden-castle-mist-Favim.com-86047.jpg", price, dateFrom, dateTo, this.authService.userId);
-    return this.places.pipe(take(1), delay(1000), tap(places => { this._places.next([...places, newPlace]) }))
+    let generatedId;
+    return this.http.post<{name: string}>('https://ionic-first-app-6f99b.firebaseio.com/offered-places.json', { ...newPlace, id: null })
+      .pipe(
+        switchMap(resData => { 
+          generatedId = resData?.name;
+          return this.places; 
+        }),
+        take(1),
+        tap(places => {
+          this._places.next([...places, {...newPlace, id: generatedId}])
+        })
+      )
   }
 
   updatePlace(id: string, title: string, description: string) {
