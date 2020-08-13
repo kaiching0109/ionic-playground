@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   NavController,
   ModalController,
   ActionSheetController,
-  LoadingController
+  LoadingController,
+  AlertController
 } from '@ionic/angular';
 
 import { PlacesService } from '../../places.service';
@@ -34,7 +35,9 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
     private actionSheetCtrl: ActionSheetController,
     private bookingService: BookingService,
     private loadingCtrl: LoadingController,
-    private authService: AuthService
+    private authService: AuthService,
+    private alertCtrl: AlertController,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -50,6 +53,16 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
           this.place = place;
           this.isBookable = place.userId !== this.authService.userId;
           this.isLoading = false;
+        }, error => {
+          this.alertCtrl.create({
+            header: 'Error occured!',
+            message: 'Something went wrong! Please visit again.',
+            buttons: [
+              { text: 'Ok', handler: () => this.router.navigate(['/places/tabs/discover']) }
+            ]
+          }).then(alertEl => {
+            alertEl.present()
+          })
         });
     });
   }
