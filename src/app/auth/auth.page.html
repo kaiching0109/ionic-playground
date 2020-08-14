@@ -31,12 +31,18 @@
             color="primary" 
             fill="clear" 
             expand="block" 
-            [disabled]="!f.valid"
-            (click)="onSwithcAuthMode()"
+            (click)="onSwitchAuthMode()"
           >
             Switch to {{ isLogin ? 'SignUp' : 'Login'}}
           </ion-button>
-          <ion-button type="submit" color="primary" *ngIf="!isLoading" (click)="onLogin()" expand="block">Login</ion-button>
+          <ion-button 
+            type="submit" 
+            color="primary" 
+            *ngIf="!isLoading" 
+            [disabled]="!f.valid"
+            expand="block">
+            {{ isLogin ? 'Login' : 'SignUp'}}
+          </ion-button>
         </ion-col>
       </ion-row>
     </ion-grid>

@@ -19,7 +19,6 @@ export class AuthPage implements OnInit {
   ngOnInit() {
   }
 
-
   onLogin(){
     this.authService.login();
     this.isLoading = true;
@@ -41,13 +40,20 @@ export class AuthPage implements OnInit {
 
       if(this.isLogin) {
         //Login
+        this.onLogin()
       } else {
         //Signup
+        console.log("hello")
+        this.authService.signup(email, password)
+          .subscribe(resData => {
+            console.log({resData})
+          })
       }
     }
   }
 
-  onSwithcAuthMode() {
+  onSwitchAuthMode() {
+    console.log("12312312")
     this.isLogin = !this.isLogin;
   }
 

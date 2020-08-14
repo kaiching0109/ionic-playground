@@ -45,7 +45,7 @@ export class BookingService {
             map(resData => {
                 return Object.keys(resData).map(key => {
                     const content = resData[key];
-                    return new Booking(key, content.placeId, content.userId, content.placeTitle, content.placeImageUrl,
+                    return new Booking(key, content.placeId, content.userId, content.placeTitle, content.placeImage,
                         content.firstName, content.lastName, content.guestNumber, new Date(content.bookedFrom), 
                         new Date(content.bookedTo))
                     
